@@ -25,28 +25,30 @@ int getDistance(Sensor sensor) {
 }  
 
 void scan(Sensor sensor){
-  delay(1000);
   maneuver.Turn('L',90);
   leftDistance = getDistance(sensor);  
-  
   delay(1000);
+  
   maneuver.Turn('R',180);
   rightDistance = getDistance(sensor);
-  
   delay(1000);
+  
   maneuver.Turn('L',90);
   frontDistance = getDistance(sensor);
-  
-  setDirection();
+  delay(1000);
 }
 
 void setDirection(){
   if((rightDistance <= 50) && (leftDistance <= 50)){
     maneuver.Reverse();
-    scan(frontSensor);    
+    delay(400);
+    scan(frontSensor);
+    setDirection();    
   }else if(rightDistance == leftDistance){
     maneuver.Reverse();
+    delay(400);
     scan(frontSensor);
+    setDirection();
   }else if(leftDistance > rightDistance){
     maneuver.Turn('L',90);
   }else if (rightDistance > leftDistance){
@@ -79,5 +81,6 @@ void loop() {
     maneuver.Forward();
   }else {
     scan(frontSensor);
+    setDirection();
   } 
 }
