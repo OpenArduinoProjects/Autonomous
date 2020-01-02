@@ -27,14 +27,14 @@ void scan(Sensor sensor){
 
 void setDirection(){
   if((rightDistance <= 50) && (leftDistance <= 50) && (frontDistance <= 50)){
-    maneuver.Reverse();
+    maneuver.Backward();
     delay(400);
     scan(frontSensor);
     setDirection();    
   }
   
   if(rightDistance == leftDistance){
-    maneuver.Reverse();
+    maneuver.Backward();
     delay(400);
     scan(frontSensor);
     setDirection();
@@ -60,12 +60,13 @@ void configureSensor(Sensor &sensor, int echo, int trig){
   pinMode(sensor.Trig, OUTPUT);
 }
 
-void setup() { 
+void setup() {
   Serial.begin(9600); 
 
   //servo.attach(3,700,2400);  // attach servo on pin 3 to servo object
   maneuver.Configure({5, 6, 7, 8, 9, 11, false});
-
+  maneuver.SetSpeed(250);
+  
   configureSensor(frontSensor, A4, A5); 
     
   maneuver.Stop();
