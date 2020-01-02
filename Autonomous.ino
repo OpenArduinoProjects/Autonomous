@@ -1,81 +1,78 @@
 #include <Maneuver.h>
 #include <Servo.h>
 
-Servo frontServo; // create servo object to control servo
+Servo servo; // create servo object to control servo
 Maneuver maneuver;
-
-struct Sensor {
-  int Echo;
-  int Trig;
-} frontSensor, rearSensor;
+Sensor frontSensor;
+Sensor rearSensor;
 
 int rightDistance = 0, leftDistance = 0, frontDistance = 0, rearDistance = 0;
 
-//Ultrasonic distance measurement Sub function
-int getDistance(Sensor sensor) {
-  digitalWrite(sensor.Trig, LOW);   
-  delayMicroseconds(2);
-  digitalWrite(sensor.Trig, HIGH);  
-  delayMicroseconds(20);
-  digitalWrite(sensor.Trig, LOW);   
-  float Fdistance = pulseIn(sensor.Echo, HIGH);  
-  Fdistance = Fdistance / 58;
-  
-  return (int)Fdistance;
-}  
-
 void scan(Sensor sensor){
   maneuver.Turn('L',90);
-  leftDistance = getDistance(sensor);  
-  delay(1000);
+  delay(200);
+  leftDistance = maneuver.Distance(sensor);  
+  delay(800);
   
   maneuver.Turn('R',180);
-  rightDistance = getDistance(sensor);
-  delay(1000);
+  delay(200);
+  rightDistance = maneuver.Distance(sensor);
+  delay(800);
   
   maneuver.Turn('L',90);
-  frontDistance = getDistance(sensor);
-  delay(1000);
+  delay(200);
+  frontDistance = maneuver.Distance(sensor);
+  delay(800);
 }
 
 void setDirection(){
-  if((rightDistance <= 50) && (leftDistance <= 50)){
+  if((rightDistance <= 50) && (leftDistance <= 50) && (frontDistance <= 50)){
     maneuver.Reverse();
     delay(400);
     scan(frontSensor);
     setDirection();    
-  }else if(rightDistance == leftDistance){
+  }
+  
+  if(rightDistance == leftDistance){
     maneuver.Reverse();
     delay(400);
     scan(frontSensor);
     setDirection();
-  }else if(leftDistance > rightDistance){
+  }
+
+  if(leftDistance > rightDistance){
     maneuver.Turn('L',90);
   }else if (rightDistance > leftDistance){
     maneuver.Turn('R', 90);
+  }else if ((frontDistance > leftDistance) && (frontDistance > rightDistance)) {
+    maneuver.Forward();
   }else {
     // write a function to randomly determine a direction here
     maneuver.Turn('L',90);
   }
 }
 
+void configureSensor(Sensor &sensor, int echo, int trig){
+  sensor.Echo = echo;
+  sensor.Trig = trig;
+  
+  pinMode(sensor.Echo, INPUT);    
+  pinMode(sensor.Trig, OUTPUT);
+}
+
 void setup() { 
   Serial.begin(9600); 
 
-  //frontServo.attach(3,700,2400);  // attach servo on pin 3 to servo object
+  //servo.attach(3,700,2400);  // attach servo on pin 3 to servo object
   maneuver.Configure({5, 6, 7, 8, 9, 11, false});
 
-  frontSensor.Echo = A4;
-  frontSensor.Trig = A5;
-  
-  pinMode(frontSensor.Echo, INPUT);    
-  pinMode(frontSensor.Trig, OUTPUT);  
+  configureSensor(frontSensor, A4, A5); 
     
   maneuver.Stop();
 }
 
 void loop() {
-  frontDistance = getDistance(frontSensor);
+  frontDistance = maneuver.Distance(frontSensor);
   
   if(frontDistance > 50){
     maneuver.Forward();
