@@ -6,44 +6,7 @@ Maneuver maneuver;
 Sensor frontSensor;
 Sensor rearSensor;
 
-int rightDistance = 0, leftDistance = 0, frontDistance = 0, rearDistance = 0;
-
-void scan(){
-  maneuver.Turn('L',90);
-  leftDistance = maneuver.Distance(frontSensor);  
-  delay(1000);
-  
-  maneuver.Turn('R',180);
-  rightDistance = maneuver.Distance(frontSensor);
-  delay(1000);
-  
-  maneuver.Turn('L',90);
-  frontDistance = maneuver.Distance(frontSensor);
-  delay(1000);
-}
-
-void setDirection(){
-  if((rightDistance <= 50) && (leftDistance <= 50) && (frontDistance <= 50)){
-    maneuver.Backward();
-    delay(400);
-    scan();
-    setDirection();    
-  }else if(rightDistance == leftDistance){
-    maneuver.Backward();
-    delay(400);
-    scan();
-    setDirection();
-  }else if((leftDistance > 50) && (leftDistance > rightDistance)){
-    maneuver.Turn('L',90);
-  }else if ((rightDistance > 50) && (rightDistance > leftDistance)){
-    maneuver.Turn('R', 90);
-  }else if((frontDistance > 50) && ((frontDistance > leftDistance) && (frontDistance > rightDistance))) {
-    maneuver.Forward();
-  }else {
-    // write a function to randomly determine a direction here
-    maneuver.Turn('L',90);
-  }
-}
+int forwardDistance = 0;
 
 void setup() {
   Serial.begin(9600); 
@@ -62,12 +25,11 @@ void setup() {
 }
 
 void loop() {
-  frontDistance = maneuver.Distance(frontSensor);
+  forwardDistance = maneuver.GetDistance(frontSensor);
   
-  if(frontDistance > 50){
+  if(forwardDistance > 50){
     maneuver.Forward();
   }else {
-    scan();
-    setDirection();
+    maneuver.Scan(frontSensor);
   } 
 }
