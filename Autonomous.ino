@@ -1,8 +1,6 @@
 #include <Maneuver.h>
 
 Maneuver maneuver;
-Sensor frontSensor;
-Sensor rearSensor;
 
 int forwardDistance = 0;
 int minimumDistance = 12;
@@ -10,24 +8,20 @@ int minimumDistance = 12;
 void setup() {
   Serial.begin(9600); 
 
-  maneuver.Configure({5, 6, 7, 8, 9, 11, true, minimumDistance});
-  maneuver.SetSpeed(250);
-
-  frontSensor.Echo = A4;
-  frontSensor.Trig = A5;
+  Settings settings = {5, 6, 7, 8, 9, 11, true, minimumDistance, {A4, A5}};
   
-  pinMode(frontSensor.Echo, INPUT);    
-  pinMode(frontSensor.Trig, OUTPUT);
-    
+  maneuver.Configure(settings);
+  maneuver.SetSpeed(250);
+  
   maneuver.Stop();
 }
 
 void loop() {
-  forwardDistance = maneuver.GetDistance(frontSensor);
-  
+  forwardDistance = maneuver.GetDistance();
+    
   if(forwardDistance >= minimumDistance){
     maneuver.Forward();
   }else {
-    maneuver.Scan(frontSensor);
-  } 
+    maneuver.Scan();
+  }
 }
