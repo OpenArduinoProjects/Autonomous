@@ -5,11 +5,12 @@ Sensor frontSensor;
 Sensor rearSensor;
 
 int forwardDistance = 0;
+int minimumDistance = 12;
 
 void setup() {
   Serial.begin(9600); 
 
-  maneuver.Configure({5, 6, 7, 8, 9, 11, true});
+  maneuver.Configure({5, 6, 7, 8, 9, 11, true, minimumDistance});
   maneuver.SetSpeed(250);
 
   frontSensor.Echo = A4;
@@ -24,7 +25,7 @@ void setup() {
 void loop() {
   forwardDistance = maneuver.GetDistance(frontSensor);
   
-  if(forwardDistance > 50){
+  if(forwardDistance >= minimumDistance){
     maneuver.Forward();
   }else {
     maneuver.Scan(frontSensor);
