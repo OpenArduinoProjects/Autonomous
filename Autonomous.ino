@@ -3,7 +3,7 @@
 Maneuver maneuver;
 
 int forwardDistance = 0;
-int minimumDistance = 12;
+int minimumDistance = 24;
 
 void setup() {
   Serial.begin(9600); 
@@ -12,14 +12,14 @@ void setup() {
   
   maneuver.Configure(settings);
   maneuver.SetSpeed(250);
-  
+   
   maneuver.Stop();
 }
 
 void loop() {
   forwardDistance = maneuver.GetDistance();
     
-  if(forwardDistance >= minimumDistance){
+  if(forwardDistance > minimumDistance){
     maneuver.Forward();
   }else {
     maneuver.Scan();
